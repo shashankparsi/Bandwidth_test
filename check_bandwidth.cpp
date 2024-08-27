@@ -12,12 +12,20 @@ void checkbandwidth(hipStream_t& stream,size_t datasize)
 		printf("memory allocation failed on HOST\n");
 		return;
 	}
+	float *hdata1=new float[datasize];
+	if(hdata1==NULL)
+	{
+		printf("memory allocation failed on HOST\n");
+		return;
+	}
 	for(size_t i=0;i<datasize;i++)
 	{
 		hdata[i]=static_cast<float>(i);
 	}
 	float *ddata=NULL;
+	float *ddata1=NULL;
 	hipMalloc((void**)&ddata,datasize*sizeof(float));
+	hipMalloc((void**)&ddata1,datasize*sizeof(float));
 	hipStreamSynchronize(stream);
 	hipEvent_t start,stop;
 	hipEventCreate(&start);
@@ -53,7 +61,7 @@ void checkbandwidth(hipStream_t& stream,size_t datasize)
         hipEventRecord(start,stream);
         for(int i=0;i<ITERATIONS;i++)
         {
-                hipMemcpyAsync(ddata,ddata,datasize*sizeof(float),hipMemcpyDeviceToDevice,stream);
+                hipMemcpyAsync(ddata1,ddata,datasize*sizeof(float),hipMemcpyDeviceToDevice,stream);
         }
         hipEventRecord(stop,stream);
         hipStreamSynchronize(stream);
@@ -67,7 +75,7 @@ void checkbandwidth(hipStream_t& stream,size_t datasize)
         hipEventRecord(start,stream);
         for(int i=0;i<ITERATIONS;i++)
         {
-                hipMemcpyAsync(hdata,hdata,datasize*sizeof(float),hipMemcpyHostToHost,stream);
+                hipMemcpyAsync(hdata1,hdata,datasize*sizeof(float),hipMemcpyHostToHost,stream);
         }
         hipEventRecord(stop,stream);
         hipStreamSynchronize(stream);
