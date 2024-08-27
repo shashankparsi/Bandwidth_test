@@ -39,7 +39,7 @@ void checkbandwidth(hipStream_t& stream,size_t datasize)
         hipEventRecord(start,stream);
         for(int i=0;i<ITERATIONS;i++)
         {
-                hipMemcpyAsync(ddata,hdata,datasize*sizeof(float),hipMemcpyDeviceToHost,stream);
+                hipMemcpyAsync(hdata,ddata,datasize*sizeof(float),hipMemcpyDeviceToHost,stream);
         }
         hipEventRecord(stop,stream);
         hipStreamSynchronize(stream);
@@ -53,7 +53,7 @@ void checkbandwidth(hipStream_t& stream,size_t datasize)
         hipEventRecord(start,stream);
         for(int i=0;i<ITERATIONS;i++)
         {
-                hipMemcpyAsync(ddata,hdata,datasize*sizeof(float),hipMemcpyDeviceToDevice,stream);
+                hipMemcpyAsync(ddata,ddata,datasize*sizeof(float),hipMemcpyDeviceToDevice,stream);
         }
         hipEventRecord(stop,stream);
         hipStreamSynchronize(stream);
@@ -67,7 +67,7 @@ void checkbandwidth(hipStream_t& stream,size_t datasize)
         hipEventRecord(start,stream);
         for(int i=0;i<ITERATIONS;i++)
         {
-                hipMemcpyAsync(ddata,hdata,datasize*sizeof(float),hipMemcpyHostToHost,stream);
+                hipMemcpyAsync(hdata,hdata,datasize*sizeof(float),hipMemcpyHostToHost,stream);
         }
         hipEventRecord(stop,stream);
         hipStreamSynchronize(stream);
@@ -75,9 +75,6 @@ void checkbandwidth(hipStream_t& stream,size_t datasize)
         hipEventElapsedTime(&milli_sec3,start,stop);
         const float bandwidth_three = ((float(datasize)*sizeof(float)*float(ITERATIONS))/(milli_sec3 * 1e6));
         printf("CPU to CPU Bandwidth is :%0.3f GB/s\n",bandwidth_three);
-
-
-
 
 	hipFree(ddata);
 	delete[] hdata;
